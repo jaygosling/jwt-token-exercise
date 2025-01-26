@@ -1,51 +1,78 @@
+import axios from 'axios'
+// import { useNavigate } from 'react-router-dom';
+
 const getState = ({ getStore, getActions, setStore }) => {
+	// const navigate = useNavigate();
 	return {
 		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			privilege: false
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
-
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
+			register: (fullName, email, password, confirmPassword) => {
+				if (password != confirmPassword) {
+					alert("Los password no coinciden");
+					return false;
 				}
+				axios.post(process.env.BACKEND_URL + "/api/register", {
+					"email": email,
+					"password": password,
+					"full_name": fullName
+				})
+					.then((res) => {
+						console.log(res);
+						if (res.data.status == 'success') {
+							alert(res.data.message);
+							window.location.href = "/login";
+						} else {
+							alert(res.data.message);
+						}
+					})
+					.catch((err) => {
+						console.log(err);
+					})
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			login: (email, password) => {
+				axios.post(process.env.BACKEND_URL + "/api/login", {
+					"email": email,
+					"password": password
+				})
+					.then((res) => {
+						console.log(res);
+						if (res.data.status == "success") {
+							sessionStorage.setItem("token", res.data.token);
+							console.log(res.data.message);
+							alert(res.data.message);
+							window.location.href = "/private";
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
+						} else {
+							alert(res.data.message);
+						}
+					})
+					.catch((err) => {
+						alert(err.message);
+					})
+			},
+			private: (token) => {
+				axios.get(process.env.BACKEND_URL + "/api/private", {
+					headers: {
+						"Authorization": `Bearer ${token}`
+					}
+				})
+					.then((res) => {
+						if (res.data.status == "success" && res.data.privilege == true) {
+							console.log(res.data);
+							setStore({ privilege: res.data.privilege });
+						} else {
+							alert(res.data.message);
+						}
+					})
+					.catch((err) => {
+						alert("Acceso no autorizado");
+					})
 			}
 		}
 	};
