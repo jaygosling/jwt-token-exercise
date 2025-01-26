@@ -44,6 +44,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log(res);
 						if (res.data.status == "success") {
 							sessionStorage.setItem("token", res.data.token);
+							sessionStorage.setItem("fullName", res.data.full_name);
 							console.log(res.data.message);
 							alert(res.data.message);
 							window.location.href = "/private";
@@ -53,7 +54,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}
 					})
 					.catch((err) => {
-						alert(err.message);
+						alert(err.data.message);
 					})
 			},
 			private: (token) => {
@@ -72,6 +73,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					.catch((err) => {
 						alert("Acceso no autorizado");
+						window.location.href = "/login";
 					})
 			}
 		}

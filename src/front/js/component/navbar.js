@@ -19,7 +19,7 @@ export const Navbar = () => {
 						<button className="btn btn-primary me-3">My Profile</button>
 					</Link>
 					<Link to="/">
-						<button className="btn btn-primary" onClick={(e) => { sessionStorage.removeItem("token"); }} >Log out</button>
+						<button className="btn btn-primary" onClick={(e) => { sessionStorage.removeItem("token"); sessionStorage.removeItem("fullName"); }} >Log out</button>
 					</Link>
 				</div>
 			</div>

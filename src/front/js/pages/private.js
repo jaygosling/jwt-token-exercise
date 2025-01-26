@@ -5,15 +5,18 @@ import { Context } from "../store/appContext";
 
 export const Private = () => {
     const { store, actions } = useContext(Context);
+    const [ fullName, setFullName ] = useState("");
 
     useEffect(() => {
         actions.private(sessionStorage.getItem("token"));
+        setFullName(sessionStorage.getItem("fullName"));
     }, [])
 
     if (store.privilege == true) {
+
         return (
             <div className="container">
-                <h1>Private</h1>
+                <h1>Welcome {fullName}</h1>
                 <div>
                     Welcome to your private page
                 </div>

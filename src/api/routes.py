@@ -33,7 +33,7 @@ def login():
     user_data = User.query.filter_by(email=body["email"], password=(sha256((salt + body["password"]).encode('utf-8')).hexdigest())).first()
     if(user_data):
         token = create_access_token(identity=body['email'])
-        return jsonify({"status": "success", "message": "Usuario identificado", "token": token}), 200
+        return jsonify({"status": "success", "message": "Usuario identificado", "full_name": user_data.full_name, "token": token}), 200
     else:
         return jsonify({"status": "error"}), 200
 
@@ -55,4 +55,5 @@ def register():
 @api.route('/private', methods=['GET'])
 @jwt_required()
 def private():
+    user_data = User.query.filter_by(email=get_jwt_identity()).first()
     return jsonify({"status": "success", "message" : "El usuario tiene privilegios", "privilege": True}), 200
